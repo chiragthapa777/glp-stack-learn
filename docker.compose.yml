@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  prom-server:
+    image: prom/prometheus:latest
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus-config.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus_data:/prometheus/data
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=4320h' # 20 days retention (4320 hours)
+      - '--storage.tsdb.path=/prometheus/data'
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Set your desired admin password here
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  grafana_data:
+
+networks:
+  default:
+    driver: bridge
